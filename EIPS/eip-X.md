@@ -22,10 +22,14 @@ This standard proposal should answer the following challenges:
 - Highlight contract behavior and it evolution, in order to ease user interaction with such contract. 
 
 
-If these challenges are answered, this will hopefully address the transfer restriction needs of other EIPs, e.g. EIP-902, EIP-1066 and EIP-1175. [MISSING LINKS], and provide a unified basis for transfer rules.
+If these challenges are answered, this proposal will provide a unified basis for transfer rules and hopefully address the transfer restriction needs of other EIPs as well, e.g. 
+[EIP-902](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-902.md), 
+[EIP-1066](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1066.md)
+and [EIP-1175](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1175.md).
 
+This document proposes specifications for a standard of **transfer rules** and interfaces to both the rules and the rule engine, which was made to be inherited by a token, but may have a much broader scope in the authors' opinion.
 
-The last section of this document will illustrate the proposal with the discussion of a rule template.
+The last section of this document illustrates the proposal with a rule template and links to rule implementations.
 
 ## Motivation
 
@@ -41,7 +45,7 @@ Rules are deployed on the blockchain as individual smart contracts, and called u
 
 ## Rule interface
 
-`Rule` interface should provide a way to validate if an address or a transfer is valid.
+`IRule` interface should provide a way to validate if an address or a transfer is valid.
 
 If one of these two methods is not applicable, it can simply be made to return true systematically.
 If any parameter of `isTransferValid` is not needed, its name should simply be commented out with `/* */`.
@@ -49,7 +53,7 @@ If any parameter of `isTransferValid` is not needed, its name should simply be c
 ```js
 pragma solidity ^0.4.25;
 
-interface Rule {
+interface IRule {
   function isAddressValid(address _address) external view returns (bool);
   function isTransferValid(address _from, address _to, uint256 _amount)
     external view returns (bool);
@@ -67,9 +71,9 @@ Rules which are cheaper to validate or have a higher chance to break should be p
 ```js
 pragma solidity ^0.4.25;
 
-import "./Rule.sol";
+import "./IRule.sol";
 
-interface WithRules {
+interface IWithRules {
   function ruleLength() public view returns (uint256);
   function rule(uint256 _ruleId) public view returns (IRule);
   function validateAddress(address _address) public view returns (bool);
@@ -89,7 +93,7 @@ To use rules within a token is as easy as having the token inherit from WithRule
 Below is a template for a rule.
 
 ```
-import "../interface/Rule.sol";
+import "../interface/IRule.sol";
 
 contract TemplateRule is IRule {
   
