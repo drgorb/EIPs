@@ -146,8 +146,8 @@ Other implementations may be written with different trade-offs: from gas savings
 
 Historical links related to this standard:
 
-- First swiss regulated tokenized shares issued by Mt Pelerin (MPS token) is using an early version of this standard: https://www.mtpelerin.com/blog/world-first-tokenized-shares
-After the token issuance and during the tokensale, the rule engine was updated several times to match changing business and legal requirements, showcasing the solidity and flexibility of the rule engine.
+- The first regulated tokenized share issued by Mt Pelerin (MPS token) is using an early version of this standard: https://www.mtpelerin.com/blog/world-first-tokenized-shares
+The rule engine was updated several times, after the token issuance and during the tokensale, to match changing business and legal requirements, showcasing the solidity and flexibility of the rule engine.
 
 ## Copyright
 Copyright and related rights waived via [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
