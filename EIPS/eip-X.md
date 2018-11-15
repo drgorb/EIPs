@@ -53,8 +53,6 @@ interface Rule {
   function isAddressValid(address _address) external view returns (bool);
   function isTransferValid(address _from, address _to, uint256 _amount)
     external view returns (bool);
-    
-  event RuleTriggered(string ruleName, uint8 errorCode)
 }
 ```
 
