@@ -11,15 +11,19 @@ created: 2018-11-09
 ## Simple Summary
 
 We propose a standard and an interface to define transfer rules, in the context of ERC20 tokens and possibly beyond.
+
+
 A rule can act based on sender, destination and amount, and is triggered (and rejects the transfer) according to any required business logic.
+
+
 To ease rule reusability and composition, we also propose an interface and base implementation for a rule engine.
 
 ## Abstract
 
 This standard proposal should answer the following challenges:
 - Enable integration of rules with interacting platforms such as exchanges, decentralized wallets and DApps.
-- Externalizing code and storage, improving altogether reusability, gas costs and contracts' memory footprint.
-- Highlight contract behavior and it evolution, in order to ease user interaction with such contract. 
+- Externale code and storage, improve altogether reusability, gas costs and contracts' memory footprint.
+- Highlight contract behavior and its evolution, in order to ease user interaction with such contract. 
 
 
 If these challenges are answered, this proposal will provide a unified basis for transfer rules and hopefully address the transfer restriction needs of other EIPs as well, e.g. 
@@ -33,7 +37,7 @@ The last section of this document illustrates the proposal with a rule template 
 
 ## Motivation
 
-ERC20 was designed as a standard interface allowing any tokens on Ethereum to be re-used by other applications: from wallets to decentralized exchanges. This has been extremely powerful, but future developments in the industry of tokenization are ringing new challenges. For example it is already hard to know exactly why an ERC20 transfer failed, and it will become even harder when many tokens add their own transfer rules to the mix; we propose that it should be trivial to determine before a tx is sent, whether the transfer should turn out valid or invalid, and why (unless conditions change in the meantime obviously). On the other hand, if the rules were changed, it should also be easily detected, so that the interacting party knows it must adjust its expectations or model.
+ERC20 was designed as a standard interface allowing any token on Ethereum to be handled by other applications: from wallets to decentralized exchanges. This has been extremely powerful, but future developments in the industry of tokenization are bringing new challenges. For example it is already hard to know exactly why an ERC20 transfer failed, and it will become even harder when many tokens add their own transfer rules to the mix; we propose that it should be trivial to determine before a tx is sent, whether the transfer should turn out valid or invalid, and why (unless conditions change in the meantime obviously). On the other hand, if the rules were changed, it should also be easily detected, so that the interacting party knows it must adjust its expectations or model.
 
 ## Specification
 
@@ -48,7 +52,7 @@ Rules are deployed on the blockchain as individual smart contracts, and called u
 `IRule` interface should provide a way to validate if an address or a transfer is valid.
 
 If one of these two methods is not applicable, it can simply be made to return true systematically.
-If any parameter of `isTransferValid` is not needed, its name should simply be commented out with `/* */`.
+If any parameter of `isTransferValid` is not needed, its name should be commented out with `/* */`.
 
 ```js
 pragma solidity ^0.4.25;
@@ -86,9 +90,17 @@ interface IWithRules {
 }
 ```
 
+## WithRules implementation
+
+We also propose a simple implementation of the rule engine, available [here](https://github.com/MtPelerin/MtPelerin-protocol/blob/master/contracts/rule/WithRules.sol). It has been kept minimal both to save on gas costs on each transfer, and to reduce the deployment cost overhead for the derived smart contract.
+
+
+On top of implementing the interface above, this engine also defines two modifiers (`whenAddressRulesAreValid`and  `whenTransferRulesAreValid`), which can be used throughout the token contract to restrict `transfer()`, `transferFrom` and any other function that needs to respect either a simple whitelist or complex transfer rules.
+
+
 ## Integration
 
-To use rules within a token is as easy as having the token inherit from WithRules, then writing rules according to the interface and deploying each rule individually. The token owner can then use `defineRules()` to attach all rules in the chosen order, within a single transaction.
+To use rules within a token is as easy as having the token inherit from WithRules, then writing rules according to the IRule interface and deploying each rule individually. The token owner can then use `defineRules()` to attach all rules in the chosen order, within a single transaction.
 
 Below is a template for a rule.
 
@@ -136,9 +148,9 @@ Other implementations may be written with different trade-offs: from gas savings
 
 - [YesNo rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/YesNoRule.sol): Trivial rule used to demonstrate both a rule and the rule engine.
 
-- [Freeze rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/FreezeRule.sol): This rule allows to prevent any transfer of tokens to or from chosen addresses.
+- [Freeze rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/FreezeRule.sol): This rule allows to prevent any transfer of tokens to or from chosen addresses. A smart blacklist.
 
-- [Lock rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/LockRule.sol): Define a global transfer policy preventing either sending or receiving tokens within a period of time. Exceptions may be granted to some addresses by the token admin.
+- [Lock rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/LockRule.sol): Define a global transfer policy preventing either sending or receiving tokens within a period of time. Exceptions may be granted to some addresses by the token admin. A smart whitelist.
 
 - [User Kyc Rule](https://github.com/MtPelerin/MtPelerin-protocol/tree/master/contracts/rule/UserKycRule.sol): Rule example relying on an existing whitelist to assert transfer and addresses validity. It is a good example of a rule that completely externalizes it's tasks.
 
@@ -150,7 +162,7 @@ Other implementations may be written with different trade-offs: from gas savings
 
 Historical links related to this standard:
 
-- The first regulated tokenized share issued by Mt Pelerin (MPS token) is using an early version of this standard: https://www.mtpelerin.com/blog/world-first-tokenized-shares
+- The first regulated tokenized share issued by Mt Pelerin (MPS token) is using an early version of this proposal: https://www.mtpelerin.com/blog/world-first-tokenized-shares
 The rule engine was updated several times, after the token issuance and during the tokensale, to match changing business and legal requirements, showcasing the solidity and flexibility of the rule engine.
 
 ## Copyright
