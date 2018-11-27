@@ -81,7 +81,8 @@ interface IWithRules {
   function ruleLength() public view returns (uint256);
   function rule(uint256 _ruleId) public view returns (IRule);
   function validateAddress(address _address) public view returns (bool);
-  function validateTransfer(address _from, address _to, uint256 _amount)
+  // the transfer rule can apply to both ERC20 and ERC721
+  function validateTransfer(address _from, address _to, uint256 _amountOrId)
     public view returns (bool);
 
   function defineRules(IRule[] _rules) public;
@@ -126,6 +127,8 @@ contract TemplateRule is IRule {
   }
 
   function isTransferValid(
+  // the sender might be neither the from nor the to and the rule might be implemented in a different contract
+    address _sender, 
     address _from,
     address _to,
     uint256 _amount)
